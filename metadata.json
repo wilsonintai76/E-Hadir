@@ -1,0 +1,8 @@
+{
+  "name": "e-Hadir JKM | Student Attendance Tracker",
+  "description": "Sistem Pengesanan & Pengesahan Kehadiran Pelajar Pintar Berasaskan Geofens Kampus & Kod Pengesahan JKM Politeknik Kuching Sarawak.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

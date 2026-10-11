@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="pksGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4c0519" />
+      <stop offset="50%" stop-color="#881337" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#pksGrad)" />
+
+  <!-- Geofence Radar Rings -->
+  <circle cx="256" cy="240" r="160" fill="none" stroke="#fda4af" stroke-opacity="0.25" stroke-width="4" stroke-dasharray="8 8" />
+  <circle cx="256" cy="240" r="110" fill="none" stroke="#fda4af" stroke-opacity="0.4" stroke-width="3" />
+  <circle cx="256" cy="240" r="60" fill="none" stroke="#fda4af" stroke-opacity="0.6" stroke-width="2" />
+
+  <!-- Compass / Biometric Core Shield -->
+  <g filter="url(#shadow)">
+    <!-- Shield / ID Token -->
+    <path d="M256 120 L330 156 V240 C330 300 290 344 256 360 C222 344 182 300 182 240 V156 Z" fill="url(#goldGrad)" />
+    
+    <!-- Fingerprint / Verified Check Core -->
+    <path d="M232 236 L248 252 L282 216" fill="none" stroke="#4c0519" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Brand Text -->
+  <text x="256" y="430" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="44" fill="#ffffff" letter-spacing="4">e-HADIR JKM</text>
+  <text x="256" y="468" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="22" fill="#fecdd3" letter-spacing="2">POLITEKNIK KUCHING SARAWAK</text>
+</svg>
