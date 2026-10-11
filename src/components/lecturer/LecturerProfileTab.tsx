@@ -8,15 +8,18 @@ import {
   Award,
   CheckCircle2,
   XCircle,
-  FileText
+  FileText,
+  LogOut
 } from 'lucide-react';
-import { LecturerProfile, ExcuseSubmission } from '../../types/attendance';
+import { LecturerProfile, ExcuseSubmission, AuthAccount } from '../../types/attendance';
 
 interface LecturerProfileTabProps {
   lecturer: LecturerProfile;
   excuses: ExcuseSubmission[];
   onApproveExcuse: (excuseId: string) => void;
   onRejectExcuse: (excuseId: string) => void;
+  onLogout?: () => void;
+  currentAccount?: AuthAccount;
 }
 
 export const LecturerProfileTab: React.FC<LecturerProfileTabProps> = ({
@@ -24,6 +27,8 @@ export const LecturerProfileTab: React.FC<LecturerProfileTabProps> = ({
   excuses,
   onApproveExcuse,
   onRejectExcuse,
+  onLogout,
+  currentAccount,
 }) => {
   const pendingExcuses = excuses.filter((e) => e.status === 'Menunggu Kelulusan');
 
@@ -198,6 +203,46 @@ export const LecturerProfileTab: React.FC<LecturerProfileTabProps> = ({
         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
           Selaras dengan Arahan Peperiksaan dan Penilaian Politeknik Malaysia, pelajar yang tidak mencapai peratus kehadiran minimum 80% tanpa kelulusan sah Penasihat Akademik hendaklah disenaraihitamkan daripada menduduki peperiksaan akhir bagi kursus berkenaan.
         </p>
+      </div>
+
+      {/* Sesi Pensyarah & Log Keluar */}
+      <div className="bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-indigo-600" />
+            <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+              Sesi Pensyarah & Keselamatan Portal
+            </h4>
+          </div>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300">
+            Akses Staf Aktif
+          </span>
+        </div>
+
+        <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 text-xs">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500">Akaun Staf:</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">
+              {currentAccount?.email || lecturer.email}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500">Jabatan:</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200">
+              {lecturer.department} · {lecturer.staffId}
+            </span>
+          </div>
+        </div>
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-xs"
+          >
+            <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            <span>Log Keluar dari Portal Pensyarah</span>
+          </button>
+        )}
       </div>
     </div>
   );

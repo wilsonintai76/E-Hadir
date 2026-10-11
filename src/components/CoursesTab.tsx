@@ -11,7 +11,8 @@ import {
   Hourglass,
   AlertTriangle,
   ScanLine,
-  Info
+  Info,
+  Calendar
 } from 'lucide-react';
 import { CourseSession } from '../types/attendance';
 import { calculateHaversineDistance, formatDistance } from '../utils/geo';
@@ -38,15 +39,17 @@ export const CoursesTab: React.FC<CoursesTabProps> = ({
   onOpenQR,
   onOpenStudentScanModal,
 }) => {
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'postponed'>('all');
 
   // Filter courses by enrolled courses for student
   let displayedCourses = courses.filter((c) => enrolledCourseIds.includes(c.id));
 
   if (filter === 'active') {
-    displayedCourses = displayedCourses.filter((c) => c.status === 'ongoing');
+    displayedCourses = displayedCourses.filter((c) => c.status === 'ongoing' && !c.postponementInfo?.isPostponed);
   } else if (filter === 'completed') {
     displayedCourses = displayedCourses.filter((c) => c.checkedIn);
+  } else if (filter === 'postponed') {
+    displayedCourses = displayedCourses.filter((c) => c.postponementInfo?.isPostponed);
   }
 
   return (
@@ -82,9 +85,10 @@ export const CoursesTab: React.FC<CoursesTabProps> = ({
       {/* Interactive Filter Segmented Control */}
       <div className="flex items-center justify-between gap-1 p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-xl text-xs font-semibold">
         {[
-          { id: 'all', label: `Kursus Saya (${enrolledCourseIds.length})` },
+          { id: 'all', label: `Semua (${enrolledCourseIds.length})` },
           { id: 'active', label: 'Sedang Berjalan' },
           { id: 'completed', label: 'Telah Hadir' },
+          { id: 'postponed', label: 'Cuti / Ganti' },
         ].map((item) => (
           <button
             key={item.id}
@@ -161,7 +165,16 @@ export const CoursesTab: React.FC<CoursesTabProps> = ({
                     </span>
                   </div>
 
-                  {course.checkedIn ? (
+                  {course.postponementInfo?.isPostponed ? (
+                    <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1 bg-amber-50 dark:bg-amber-950/70 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
+                      <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                      <span>
+                        {course.postponementInfo.actionType === 'replacement_scheduled'
+                          ? 'Ditangguhkan (Ada Ganti)'
+                          : 'Pelepasan Cuti (SPMP)'}
+                      </span>
+                    </span>
+                  ) : course.checkedIn ? (
                     <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                       <span>Hadir ({course.checkInTime})</span>
@@ -183,6 +196,51 @@ export const CoursesTab: React.FC<CoursesTabProps> = ({
                     {course.name}
                   </h3>
                 </div>
+
+                {/* Postponement & Replacement Notice Card */}
+                {course.postponementInfo?.isPostponed && (
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50/70 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs space-y-2">
+                    <div className="flex items-center justify-between font-bold text-amber-900 dark:text-amber-200">
+                      <div className="flex items-center gap-2 truncate">
+                        <Calendar className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                        <span className="truncate">{course.postponementInfo.reasonTitle}</span>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-200 font-bold shrink-0">
+                        SPMP Terlindung
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] text-amber-900 dark:text-amber-200 leading-relaxed">
+                      {course.postponementInfo.actionType === 'replacement_scheduled' ? (
+                        <div className="space-y-1.5">
+                          <p className="font-semibold text-slate-800 dark:text-slate-200">
+                            Jadual Kelas Gantian Rasmi:
+                          </p>
+                          <div className="p-2.5 bg-white/80 dark:bg-slate-900/80 rounded-xl border border-amber-200 dark:border-amber-900 text-slate-800 dark:text-slate-200 space-y-0.5">
+                            <div className="font-bold flex items-center gap-1.5">
+                              <span>📅 {course.postponementInfo.replacementDate}</span>
+                              <span>·</span>
+                              <span>⏰ {course.postponementInfo.replacementStartTime} - {course.postponementInfo.replacementEndTime}</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400">
+                              📍 Lokasi Bengkel: {course.postponementInfo.replacementVenue}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-2.5 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-900 text-emerald-900 dark:text-emerald-200">
+                          🛡️ <strong>Pelepasan Jam Rasmi (SPMP)</strong>: Jam pertemuan minggu ini dikecualikan secara rasmi. Ia <strong>TIDAK DIKIRA</strong> sebagai ketidakhadiran, maka syarat 80% menduduki peperiksaan akhir anda kekal terlindung tanpa sebarang penalti.
+                        </div>
+                      )}
+                    </div>
+
+                    {course.postponementInfo.notes && (
+                      <div className="text-[11px] text-slate-600 dark:text-slate-400 italic bg-white/60 dark:bg-slate-850/60 p-2 rounded-xl border border-amber-100 dark:border-amber-900/50">
+                        Nota Pensyarah: "{course.postponementInfo.notes}"
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Contact Hours & SPMP Progress Bar */}
                 <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
@@ -252,7 +310,16 @@ export const CoursesTab: React.FC<CoursesTabProps> = ({
 
                 {/* Actions */}
                 <div className="pt-1 flex items-center gap-2">
-                  {course.checkedIn ? (
+                  {course.postponementInfo?.isPostponed ? (
+                    <div className="w-full py-2.5 px-3 rounded-xl bg-amber-100/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-300 font-bold text-xs flex items-center justify-center gap-2">
+                      <Calendar className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <span>
+                        {course.postponementInfo.actionType === 'replacement_scheduled'
+                          ? `Pendaftaran Dibuka Semasa Sesi Ganti (${course.postponementInfo.replacementDate})`
+                          : 'Sesi Dikecualikan Rasmi · Tiada Pendaftaran Diperlukan'}
+                      </span>
+                    </div>
+                  ) : course.checkedIn ? (
                     <button
                       onClick={() => onViewSlip(course)}
                       className="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 active:scale-95 transition"

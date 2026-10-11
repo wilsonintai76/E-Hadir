@@ -30,6 +30,7 @@ import { ProjectorQRModal } from './components/lecturer/ProjectorQRModal';
 import { ClassQRModal } from './components/lecturer/ClassQRModal';
 import { CreateCourseModal } from './components/lecturer/CreateCourseModal';
 import { AddStudentModal } from './components/lecturer/AddStudentModal';
+import { PostponeClassModal } from './components/lecturer/PostponeClassModal';
 
 // Enrollment Modal
 import { StudentScanModal } from './components/enrollment/StudentScanModal';
@@ -65,6 +66,7 @@ import {
   AuthAccount,
   DeviceBinding,
   AnomalyReport,
+  ClassPostponementInfo,
 } from './types/attendance';
 import {
   Radar,
@@ -174,6 +176,7 @@ export default function App() {
   const [activeBiometricCourse, setActiveBiometricCourse] = useState<CourseSession | null>(null);
   const [projectorCourse, setProjectorCourse] = useState<CourseSession | null>(null);
   const [classQRCourse, setClassQRCourse] = useState<CourseSession | null>(null);
+  const [postponeCourse, setPostponeCourse] = useState<CourseSession | null>(null);
   const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
   const [showStudentScanModal, setShowStudentScanModal] = useState<boolean>(false);
   const [showCreateCourseModal, setShowCreateCourseModal] = useState<boolean>(false);
@@ -877,6 +880,53 @@ export default function App() {
     }
   };
 
+  const handleSavePostponement = (
+    courseId: string,
+    postponement: ClassPostponementInfo | null
+  ) => {
+    setCourses((prev) =>
+      prev.map((c) => {
+        if (c.id !== courseId) return c;
+        if (!postponement) {
+          // Revert back to active session
+          return {
+            ...c,
+            status: 'ongoing',
+            sessionOpen: true,
+            postponementInfo: undefined,
+          };
+        }
+        return {
+          ...c,
+          status: 'postponed',
+          sessionOpen: false,
+          postponementInfo: postponement,
+        };
+      })
+    );
+
+    const target = courses.find((c) => c.id === courseId);
+    if (target) {
+      if (postponement) {
+        addToast(
+          'Kelas Ditangguhkan!',
+          `${target.code} (${target.section}): ${postponement.reasonTitle}. ${
+            postponement.actionType === 'replacement_scheduled'
+              ? `Kelas Ganti: ${postponement.replacementDate}`
+              : 'Pelepasan jam SPMP.'
+          }`,
+          'info'
+        );
+      } else {
+        addToast(
+          'Penangguhan Dibatalkan',
+          `${target.code} (${target.section}) dikembalikan ke jadual biasa.`,
+          'info'
+        );
+      }
+    }
+  };
+
   const handleVerifyManually = (studentId: string) => {
     const studentItem = roster.find((s) => s.id === studentId);
     if (!studentItem) return;
@@ -1100,6 +1150,7 @@ export default function App() {
                       onOpenClassQR={setClassQRCourse}
                       onOpenCreateCourse={() => setShowCreateCourseModal(true)}
                       onDeleteCourse={handleDeleteCourse}
+                      onOpenPostponeModal={setPostponeCourse}
                       onSwitchToLiveRoster={(cId) => {
                         setSelectedClassId(cId);
                         setCurrentTab('live');
@@ -1432,6 +1483,7 @@ export default function App() {
                     onOpenClassQR={setClassQRCourse}
                     onOpenCreateCourse={() => setShowCreateCourseModal(true)}
                     onDeleteCourse={handleDeleteCourse}
+                    onOpenPostponeModal={setPostponeCourse}
                     onSwitchToLiveRoster={(cId) => {
                       setSelectedClassId(cId);
                       setCurrentTab('live');
@@ -1565,6 +1617,14 @@ export default function App() {
           presentCount={projectorCourse.presentCount}
           totalStudents={projectorCourse.totalStudents}
           onClose={() => setProjectorCourse(null)}
+        />
+      )}
+
+      {postponeCourse && (
+        <PostponeClassModal
+          course={postponeCourse}
+          onClose={() => setPostponeCourse(null)}
+          onSavePostponement={handleSavePostponement}
         />
       )}
 

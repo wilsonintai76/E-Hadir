@@ -206,7 +206,7 @@ export const INITIAL_COURSES: CourseSession[] = [
     day: 'Ahad / Hari Ini',
     startTime: '10:30 AM',
     endTime: '12:30 PM',
-    status: 'ongoing',
+    status: 'postponed',
     contactHoursPerWeek: 2,
     totalSemesterWeeks: 14,
     currentWeekHoursTaught: 12,
@@ -220,8 +220,21 @@ export const INITIAL_COURSES: CourseSession[] = [
     sessionPasscode: '5814',
     totalStudents: 30,
     presentCount: 18,
-    sessionOpen: true,
-    enrollmentCode: 'JKM-3010'
+    sessionOpen: false,
+    enrollmentCode: 'JKM-3010',
+    postponementInfo: {
+      isPostponed: true,
+      reasonType: 'cuti_umum',
+      reasonTitle: 'Cuti Umum: Hari Deepavali & Kelepasan Am Persekutuan',
+      postponedDate: 'Minggu Ini (Ahad, 18 Okt 2026)',
+      actionType: 'replacement_scheduled',
+      replacementDate: 'Sabtu, 24 Okt 2026',
+      replacementStartTime: '09:00 AM',
+      replacementEndTime: '11:00 AM',
+      replacementVenue: 'Makmal CAD/CAM & Simulasi Komputer (Aras 2 Blok JKM)',
+      notes: 'Sila lengkapkan simulasi modul hidraulik sebelum menghadiri sesi penggantian amali ini.',
+      updatedAt: '08:00 AM'
+    }
   },
   {
     id: 'DJJ20053',

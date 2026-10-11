@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ShieldCheck, AlertTriangle, Smartphone, User, RefreshCw, CheckCircle2, Lock } from 'lucide-react';
+import { X, ShieldCheck, AlertTriangle, Smartphone, User, RefreshCw, CheckCircle2, Lock, LogOut } from 'lucide-react';
 import { AuthAccount, DeviceBinding } from '../../types/attendance';
 import { MOCK_ACCOUNTS } from '../../data/mockData';
 
@@ -8,6 +8,7 @@ interface AccountSwitchModalProps {
   deviceBinding: DeviceBinding;
   onSelectAccount: (accountKey: string) => void;
   onToggleDeviceLock: () => void;
+  onLogout?: () => void;
   onClose: () => void;
 }
 
@@ -16,6 +17,7 @@ export const AccountSwitchModal: React.FC<AccountSwitchModalProps> = ({
   deviceBinding,
   onSelectAccount,
   onToggleDeviceLock,
+  onLogout,
   onClose,
 }) => {
   return (
@@ -157,9 +159,22 @@ export const AccountSwitchModal: React.FC<AccountSwitchModalProps> = ({
           </div>
         </div>
 
+        {onLogout && (
+          <button
+            onClick={() => {
+              onClose();
+              onLogout();
+            }}
+            className="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer"
+          >
+            <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            <span>Log Keluar dari Portal e-Hadir JKM</span>
+          </button>
+        )}
+
         <button
           onClick={onClose}
-          className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs active:scale-95 transition"
+          className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs active:scale-95 transition cursor-pointer"
         >
           Selesai
         </button>

@@ -66,7 +66,21 @@ export interface LecturerProfile {
   avatarUrl: string;
 }
 
-export type ClassStatus = 'ongoing' | 'upcoming' | 'completed' | 'cancelled';
+export type ClassStatus = 'ongoing' | 'upcoming' | 'completed' | 'cancelled' | 'postponed';
+
+export interface ClassPostponementInfo {
+  isPostponed: boolean;
+  reasonType: 'cuti_umum' | 'komitmen_pensyarah' | 'cuti_peristiwa' | 'penyelenggaraan_bengkel' | 'lain_lain';
+  reasonTitle: string; // e.g. "Cuti Umum: Hari Malaysia" or "Kursus Akreditasi ETAC Pensyarah"
+  postponedDate: string; // e.g. "Ahad, 15 Okt 2026"
+  actionType: 'replacement_scheduled' | 'waived'; // 'replacement_scheduled' (Ada Kelas Ganti) or 'waived' (Pelepasan Jam - Tiada Penalti)
+  replacementDate?: string; // e.g. "Sabtu, 24 Okt 2026"
+  replacementStartTime?: string; // e.g. "09:00 AM"
+  replacementEndTime?: string; // e.g. "12:00 PM"
+  replacementVenue?: string; // e.g. "Bengkel Kimpalan & Fabrikasi JKM"
+  notes?: string;
+  updatedAt?: string;
+}
 
 export interface CourseSession {
   id: string;
@@ -100,6 +114,7 @@ export interface CourseSession {
   presentCount: number;
   sessionOpen: boolean;
   enrollmentCode: string; // 6-char e.g. "JKM-3009"
+  postponementInfo?: ClassPostponementInfo;
 }
 
 export interface StudentRosterItem {

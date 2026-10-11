@@ -12,21 +12,29 @@ import {
   CheckCircle,
   FileText,
   Calculator,
-  Hourglass
+  Hourglass,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
-import { StudentProfile, ExcuseSubmission } from '../types/attendance';
+import { StudentProfile, ExcuseSubmission, AuthAccount } from '../types/attendance';
 import { SEMESTER_PARAMS } from '../data/mockData';
 
 interface ProfileTabProps {
   student: StudentProfile;
   excuses: ExcuseSubmission[];
   onOpenExcuseModal: () => void;
+  onLogout?: () => void;
+  currentAccount?: AuthAccount;
+  onOpenAccountModal?: () => void;
 }
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({
   student,
   excuses,
   onOpenExcuseModal,
+  onLogout,
+  currentAccount,
+  onOpenAccountModal,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -250,6 +258,52 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
         >
           <Mail className="w-4 h-4 text-rose-700 dark:text-rose-400" />
         </a>
+      </div>
+
+      {/* Sesi Akaun & Kawalan Log Keluar */}
+      <div className="bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+              Sesi Akaun Pelajar & Keselamatan
+            </h4>
+          </div>
+          {onOpenAccountModal && (
+            <button
+              onClick={onOpenAccountModal}
+              className="text-[11px] font-bold text-rose-700 dark:text-rose-400 hover:underline"
+            >
+              Ubah Akaun
+            </button>
+          )}
+        </div>
+
+        <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl space-y-1.5 text-xs">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500">Emel Siswa Aktif:</span>
+            <span className="font-mono font-bold text-slate-800 dark:text-slate-200 truncate max-w-[200px]">
+              {currentAccount?.email || `${student.id.toLowerCase()}@siswa.poliku.edu.my`}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500">Status Sesi:</span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Aktif (Peranti Terikat)
+            </span>
+          </div>
+        </div>
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-xs"
+          >
+            <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            <span>Log Keluar dari Sistem e-Hadir JKM</span>
+          </button>
+        )}
       </div>
     </div>
   );
